@@ -1,15 +1,24 @@
 import java.io.*;
 import java.net.*;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
+import java.sql.Connection;
+
+import org.sqlite.SQLiteConnection;
 
 class Server {
 	private ServerSocket socket;
 	private int playerCount; //limiting to 2
+	private ArrayList<Pokemon> pokemonList;
 
 	private ServerSideConnection playerOne;
 	private ServerSideConnection playerTwo;
 	private int roundCount = 0;
+	private boolean calculateBool = false;
+	private Connection dbconn;
 
 	private enum SERVER_STATE {WAITING_ON_PLAYERS, START, PLAYER_1_TURN, PLAYER_2_TURN, CALCULATING, END}
 	private SERVER_STATE myState;
@@ -17,6 +26,7 @@ class Server {
 	//default constructor
 	public Server() {
 		System.out.println("----------------------\n\tServer\n----------------------");
+		connectToDatabase();
 		playerCount = 0;
 		this.myState = SERVER_STATE.WAITING_ON_PLAYERS;
 		try {
@@ -24,19 +34,30 @@ class Server {
 		} catch (IOException ex) { System.out.println("IO Exception from default constructor."); }
 	}
 
+	private void connectToDatabase(){
+		System.out.println("Initializing Database...");
+		try {
+			dbconn = DriverManager.getConnection("jdbc:sqlite:pokemon.db");
+			ResultSet pokemon = dbconn.prepareStatement("SELECT * FROM pokemon").executeQuery();
+			this.pokemonList = new ArrayList<Pokemon>();
+			while (pokemon.next()){
+				Pokemon temp = new Pokemon(pokemon.getInt(1), pokemon.getString(2), pokemon.getString(3));
+				this.pokemonList.add(temp);
+			}
+		} catch (SQLException e){
+			System.out.println("Caught SQLException!");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+
 	private void broadcastMessageToAllPlayers(String msg){
 		try {
 			this.playerTwo.sendMessageToPlayer(msg);
 			this.playerOne.sendMessageToPlayer(msg);
 		} catch (Exception e){
 			e.printStackTrace();
-		}
-	}
-
-	//Called when all players ready.
-	private void mainGameLoop(){
-		while (true) {
-
 		}
 	}
 
@@ -63,13 +84,21 @@ class Server {
 		}
 		if (this.myState == SERVER_STATE.PLAYER_1_TURN){
 			if (message.equals("SEND_TURN") && this.playerOne == scc){
-				System.out.println("Player 1 move: " + option);
-			} else {
-				System.out.println("The fuck");
+				this.myState = SERVER_STATE.PLAYER_2_TURN;
+				playerTwoTurn();
+				return;
 			}
 		}
 		if (this.myState == SERVER_STATE.PLAYER_2_TURN){
+			if (message.equals("SEND_TURN") && this.playerTwo == scc){
+				if (this.calculateBool){
+					this.myState = SERVER_STATE.CALCULATING;
 
+				}
+				this.myState = SERVER_STATE.PLAYER_1_TURN;
+				playerOneTurn();
+				return;
+			}//add if statement for if the message is other players turn
 		}
 		if (this.myState == SERVER_STATE.CALCULATING){
 
@@ -85,12 +114,24 @@ class Server {
 		Random rand = new Random();
 		int num = rand.nextInt(1);
 		if (num == 0){
-			this.playerOne.sendMessageToPlayer("YOUR_TURN " + ++roundCount);
-			this.stateHandler("PLAYER_1_TURN", "", this.playerOne);
+			playerOneTurn();
 		} else {
-			this.playerTwo.sendMessageToPlayer("YOUR_TURN " + ++roundCount);
-			this.stateHandler("PLAYER_2_TURN", "", this.playerTwo);
+			playerTwoTurn();
 		}
+	}
+
+	private void performCalculations() {
+
+	}
+
+	private void playerOneTurn(){
+		this.playerOne.sendMessageToPlayer("YOUR_TURN " + ++roundCount);
+		this.stateHandler("PLAYER_1_TURN", "", this.playerOne);
+	}
+
+	private void playerTwoTurn(){
+		this.playerTwo.sendMessageToPlayer("YOUR_TURN " + ++roundCount);
+		this.stateHandler("PLAYER_2_TURN", "", this.playerTwo);
 	}
 
 	public void onMessageFromPlayer(String msg, ServerSideConnection scc){
@@ -129,8 +170,13 @@ class Server {
 			System.out.println(playerCount + " player(s) joined.");
 			Thread.sleep(1000); 	//Wait one second to start the game to ensure
 										//client caught the NAME_ACCEPT
-			stateHandler("ALL_READY", "-1", null); //Use main thread to sit in the game loop, separate threads will
+			sendPokemonToUsers(); //Send them the pokemon so they can make their teams.
 		} catch (IOException ex) {  System.out.println("IO Exception from acceptConnection()."); }
+	}
+
+	private void sendPokemonToUsers(){
+		this.playerOne.sendPokemonListToPlayers(this.pokemonList);
+		this.playerTwo.sendPokemonListToPlayers(this.pokemonList);
 	}
 
 	public static void main(String[] args) {

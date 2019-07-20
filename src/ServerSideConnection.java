@@ -1,7 +1,9 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 class ServerSideConnection implements Runnable {
     private Socket socket;
@@ -42,6 +44,17 @@ class ServerSideConnection implements Runnable {
         try {
             this.output.write(msg.getBytes());
             this.output.flush();
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    public void sendPokemonListToPlayers(ArrayList<Pokemon> list){
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(this.socket.getOutputStream());
+            oos.writeObject(list);
+            oos.flush();
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
