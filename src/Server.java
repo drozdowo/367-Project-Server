@@ -17,6 +17,7 @@ class Server {
 	private ServerSideConnection playerOne;
 	private ServerSideConnection playerTwo;
 	private int roundCount = 0;
+	private int readyCount = 0;
 	private boolean calculateBool = false;
 	private Connection dbconn;
 
@@ -71,7 +72,13 @@ class Server {
 				this.broadcastMessageToAllPlayers("ALL_READY -1");
 				this.randomizePlayerTurn();
 				return;
+			} else if (message.equals("POKEMON_READY")){
+				System.out.println("Pokemon Ready...");
+				if (++readyCount == 2){
+					stateHandler("ALL_READY", "0", null);
+				}
 			}
+			return;
 		}
 		if(this.myState == SERVER_STATE.START){
 			if (message.equals("PLAYER_1_TURN") && this.playerOne == scc){
@@ -142,6 +149,7 @@ class Server {
 		String message = msg.split(" ")[0];
 		String option = msg.split(" ")[1];
 		if (message.equals("NAME_REG")) { //name registration
+			System.out.println("Name Accept: ");
 			scc.setPlayerName(option);
 			scc.sendMessageToPlayer("NAME_ACCEPT " + option);
 		} else {

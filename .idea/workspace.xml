@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7f94d63e-00ce-4c89-a8e7-36c452542b84" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Pokemon.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/sqlite-jdbc-3.27.2.1.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/367-Project-Server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/367-Project-Server.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/367-Project-Server/Server$SERVER_STATE.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/367-Project-Server/Server.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ServerSideConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServerSideConnection.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -26,8 +19,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="389">
-              <caret line="43" column="106" selection-start-line="43" selection-start-column="106" selection-end-line="43" selection-end-column="106" />
+            <state relative-caret-position="-138">
+              <caret line="151" column="46" selection-start-line="151" selection-start-column="46" selection-end-line="151" selection-end-column="46" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -105,8 +98,8 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="990" />
-    <option name="y" value="16" />
+    <option name="x" value="892" />
+    <option name="y" value="3" />
     <option name="width" value="1024" />
     <option name="height" value="1047" />
   </component>
@@ -192,8 +185,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="990" y="16" width="1024" height="1047" extended-state="0" />
-    <editor active="true" />
+    <frame x="892" y="3" width="1024" height="1047" extended-state="0" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.3195021" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -264,8 +256,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="43" column="106" selection-start-line="43" selection-start-column="106" selection-end-line="43" selection-end-column="106" />
+        <state relative-caret-position="-138">
+          <caret line="151" column="46" selection-start-line="151" selection-start-column="46" selection-end-line="151" selection-end-column="46" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
