@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 //Serializable means we can turn it into bytes and send it through the wire to be
@@ -8,12 +9,14 @@ public class Pokemon implements Serializable {
     private int id;
     private String name;
     private String type;
+    private ArrayList<PokemonMove> moves;
 
 
-    public Pokemon(int id, String name, String type){
+    public Pokemon(int id, String name, String type, ArrayList<PokemonMove> moves){
         this.setId(id);
         this.setName(name);
         this.setType(type);
+        this.setMoves(moves);
     }
 
     public int getId() {
@@ -40,6 +43,13 @@ public class Pokemon implements Serializable {
         this.type = type;
     }
 
+    public ArrayList<PokemonMove> getMoves() {
+        return moves;
+    }
+
+    public void setMoves(ArrayList<PokemonMove> moves) {
+        this.moves = moves;
+    }
     public void printMe(){
         System.out.println("Pokemon Name: " + this.getName() + " | Pokemon Type: " + this.getType());
     }
