@@ -41,14 +41,14 @@ class Server {
 				//We'll grab all of their moves
 				int id = pokemon.getInt(1);
 				//Got the ID of this pokemon, now we need to iterate and get all of their moves.
-				PreparedStatement movesPS = dbconn.prepareStatement("SELECT * FROM pokemon_moves WHERE id = ?");
+				PreparedStatement movesPS = dbconn.prepareStatement("SELECT * FROM pokemon_moves WHERE id = ? ORDER BY sequence");
 				movesPS.setInt(1, id);
 				ResultSet movesRS = movesPS.executeQuery();
 				ArrayList<PokemonMove> tempMoves = new ArrayList<PokemonMove>();
 				while (movesRS.next()){
 					//Now we need to create the moves for this Pokemon
-					System.out.println("Got move: " + movesRS.getString("name"));
-					tempMoves.add(new PokemonMove(movesRS.getString("name"), movesRS.getString("type"), movesRS.getInt("minDamage"), movesRS.getInt("maxDamage"), movesRS.getDouble("critChance")));
+//					System.out.println("Got move: " + movesRS.getString("name"));
+					tempMoves.add(new PokemonMove(movesRS.getString("name"), movesRS.getString("type"), movesRS.getInt("minDamage"), movesRS.getInt("maxDamage"), movesRS.getDouble("critChance"), movesRS.getInt("sequence")));
 				}
 				Pokemon temp = new Pokemon(pokemon.getInt("id"), pokemon.getString("name"), pokemon.getString("type"), pokemon.getInt("hp"), tempMoves);
 				this.pokemonList.add(temp);
@@ -81,7 +81,7 @@ class Server {
 				this.randomizePlayerTurn();
 				return;
 			} else if (message.equals("POKEMON_READY")){
-				System.out.println("Pokemon Ready...");
+				scc.setPokemon(this.pokemonList.get(Integer.parseInt(option)));
 				if (++readyCount == 2){
 					stateHandler("ALL_READY", "0", null);
 				}
@@ -100,17 +100,28 @@ class Server {
 		if (this.myState == SERVER_STATE.PLAYER_1_TURN){
 			if (message.equals("SEND_TURN") && this.playerOne == scc){
 				this.myState = SERVER_STATE.PLAYER_2_TURN;
+				//Handle their turn:
+				handleDamage(scc, playerTwo, Integer.parseInt(option.split("_")[1]));
+				try{
+					Thread.sleep(100);
+				} catch (InterruptedException e){
+					e.printStackTrace();
+					System.exit(1);
+				}
 				playerTwoTurn();
 				return;
 			}
 		}
 		if (this.myState == SERVER_STATE.PLAYER_2_TURN){
 			if (message.equals("SEND_TURN") && this.playerTwo == scc){
-				if (this.calculateBool){
-					this.myState = SERVER_STATE.CALCULATING;
-
-				}
 				this.myState = SERVER_STATE.PLAYER_1_TURN;
+				handleDamage(scc, playerOne, Integer.parseInt(option.split("_")[1]));
+				try{
+					Thread.sleep(100);
+				} catch (InterruptedException e){
+					e.printStackTrace();
+					System.exit(1);
+				}
 				playerOneTurn();
 				return;
 			}//add if statement for if the message is other players turn
@@ -135,8 +146,21 @@ class Server {
 		}
 	}
 
-	private void performCalculations() {
-
+	private void handleDamage(ServerSideConnection attacker, ServerSideConnection defender, int move){
+		PokemonMove attack = attacker.getPokemon().getMoves().get(move);
+		int dmg = attack.getAttack();
+		boolean didCrit = attack.didCrit();
+		defender.getPokemon().setHp(defender.getPokemon().getHp()-dmg);
+		System.out.println(attacker.getPlayerName() + "'s " + attacker.getPokemon().getName() + " did " + dmg + " to " + defender.getPlayerName() + "'s " + defender.getPokemon().getName() + " using " + move + (didCrit?" It was Super Effective!":""));
+		if(defender.getPokemon().getHp() <= 0){
+			attacker.sendMessageToPlayer("YOU_WIN "+defender.getPokemon().getId()+"_"+move+"_"+dmg+"_"+(didCrit?"1":"0"));
+			defender.sendMessageToPlayer("YOU_LOSE "+attacker.getPokemon().getId()+"_"+move+"_"+dmg+"_"+(didCrit?"1":"0"));
+			System.out.println("Game Over! Winner: " + attacker.getPlayerName() + " with their " + attacker.getPokemon().getName()+ ".");
+			System.exit(0);
+		} else {
+			attacker.sendMessageToPlayer("DEAL_DAMAGE "+defender.getPokemon().getId()+"_"+move+"_"+dmg+"_"+(didCrit?"1":"0"));
+			defender.sendMessageToPlayer("RECEIVE_DAMAGE "+attacker.getPokemon().getId()+"_"+move+"_"+dmg+"_"+(didCrit?"1":"0"));
+		}
 	}
 
 	private void playerOneTurn(){
@@ -157,7 +181,7 @@ class Server {
 		String message = msg.split(" ")[0];
 		String option = msg.split(" ")[1];
 		if (message.equals("NAME_REG")) { //name registration
-			System.out.println("Name Accept: ");
+//			System.out.println("Name Accept: ");
 			scc.setPlayerName(option);
 			scc.sendMessageToPlayer("NAME_ACCEPT " + option);
 		} else {

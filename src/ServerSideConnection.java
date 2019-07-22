@@ -10,7 +10,7 @@ class ServerSideConnection implements Runnable {
     private int pid;
     private String playerName;
     private Server server;
-    private int playerHp;
+    private Pokemon pokemon;
 
     public ServerSideConnection(Socket s, int pid, Server server) {
         this.socket = s;
@@ -68,5 +68,13 @@ class ServerSideConnection implements Runnable {
 
     public int getPlayerID(){
         return this.pid;
+    }
+
+    public Pokemon getPokemon() {
+        return pokemon;
+    }
+
+    public void setPokemon(Pokemon pokemon) {
+        this.pokemon = pokemon;
     }
 }
