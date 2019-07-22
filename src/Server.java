@@ -1,13 +1,8 @@
 import java.io.*;
 import java.net.*;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Random;
-import java.sql.Connection;
-
-import org.sqlite.SQLiteConnection;
 
 class Server {
 	private ServerSocket socket;
@@ -42,7 +37,20 @@ class Server {
 			ResultSet pokemon = dbconn.prepareStatement("SELECT * FROM pokemon").executeQuery();
 			this.pokemonList = new ArrayList<Pokemon>();
 			while (pokemon.next()){
-				Pokemon temp = new Pokemon(pokemon.getInt(1), pokemon.getString(2), pokemon.getString(3));
+				//Now we need to construct the Pokemon objects.
+				//We'll grab all of their moves
+				int id = pokemon.getInt(1);
+				//Got the ID of this pokemon, now we need to iterate and get all of their moves.
+				PreparedStatement movesPS = dbconn.prepareStatement("SELECT * FROM pokemon_moves WHERE id = ?");
+				movesPS.setInt(1, id);
+				ResultSet movesRS = movesPS.executeQuery();
+				ArrayList<PokemonMove> tempMoves = new ArrayList<PokemonMove>();
+				while (movesRS.next()){
+					//Now we need to create the moves for this Pokemon
+					System.out.println("Got move: " + movesRS.getString("name"));
+					tempMoves.add(new PokemonMove(movesRS.getString("name"), movesRS.getString("type"), movesRS.getInt("minDamage"), movesRS.getInt("maxDamage"), movesRS.getDouble("critChance")));
+				}
+				Pokemon temp = new Pokemon(pokemon.getInt("id"), pokemon.getString("name"), pokemon.getString("type"), pokemon.getInt("hp"), tempMoves);
 				this.pokemonList.add(temp);
 			}
 		} catch (SQLException e){

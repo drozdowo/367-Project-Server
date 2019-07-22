@@ -10,12 +10,13 @@ public class Pokemon implements Serializable {
     private String name;
     private String type;
     private ArrayList<PokemonMove> moves;
+    private int hp;
 
-
-    public Pokemon(int id, String name, String type, ArrayList<PokemonMove> moves){
+    public Pokemon(int id, String name, String type, int HP, ArrayList<PokemonMove> moves){
         this.setId(id);
         this.setName(name);
         this.setType(type);
+        this.setHp(HP);
         this.setMoves(moves);
     }
 
@@ -50,6 +51,16 @@ public class Pokemon implements Serializable {
     public void setMoves(ArrayList<PokemonMove> moves) {
         this.moves = moves;
     }
+
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
     public void printMe(){
         System.out.println("Pokemon Name: " + this.getName() + " | Pokemon Type: " + this.getType());
     }
