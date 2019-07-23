@@ -26,8 +26,9 @@ class ServerSideConnection implements Runnable {
         try {
         while (true){
             if (this.input.available() > 0){ //data available
-                byte[] buffer = this.input.readNBytes(this.input.available());
-                int len = buffer.length;
+                byte[] buffer = new byte[120120];
+                int len = this.input.available();
+                this.input.read(buffer, 0, this.input.available());
                 this.server.onMessageFromPlayer(new String(buffer, 0, len), this);
             }
             Thread.sleep(THREAD_DELAY);
