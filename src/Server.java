@@ -76,13 +76,14 @@ class Server {
 			//if we're waiting on players...
 			if (message.equals("ALL_READY")){
 				//Waiting on players and we're all ready...
-				this.myState = SERVER_STATE.START;
-				this.broadcastMessageToAllPlayers("ALL_READY -1");
-				this.randomizePlayerTurn();
+				myState = SERVER_STATE.START;
+				broadcastMessageToAllPlayers("ALL_READY -1");
+				randomizePlayerTurn();
 				return;
 			} else if (message.equals("POKEMON_READY")){
 				scc.setPokemon(this.pokemonList.get(Integer.parseInt(option)));
-				if (++readyCount == 2){
+				readyCount++;
+				if (readyCount == 2){
 					stateHandler("ALL_READY", "0", null);
 				}
 			}
@@ -137,6 +138,13 @@ class Server {
 	}
 
 	private void randomizePlayerTurn(){
+		//Sleeping for Java8. No idea why. Works without in Java12
+		try{
+			Thread.sleep(100);
+		} catch (Exception e){
+			e.printStackTrace();
+			System.exit(1);
+		}
 		Random rand = new Random();
 		int num = rand.nextInt(1);
 		if (num == 0){

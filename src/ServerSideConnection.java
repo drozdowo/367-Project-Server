@@ -31,7 +31,6 @@ class ServerSideConnection implements Runnable {
                 this.input.read(buffer, 0, this.input.available());
                 this.server.onMessageFromPlayer(new String(buffer, 0, len), this);
             }
-            Thread.sleep(THREAD_DELAY);
         }
     } catch (Exception e){
         e.printStackTrace();
